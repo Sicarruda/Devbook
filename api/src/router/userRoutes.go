@@ -1,34 +1,36 @@
 package router
 
+import "api/src/controllers"
+
 var userRoutes = []Router{
 	{
 		URI:             "/users",
 		Method:          "POST",
-		Function:        CreateUser,
+		Function:        controllers.CreateUser,
 		IsAutentication: false,
 	},
 	{
 		URI:             "/users",
 		Method:          "GET",
-		Function:        GetUsers,
+		Function:        controllers.GetUsers,
 		IsAutentication: false,
 	},
 	{
 		URI:             "/users/{userId}",
 		Method:          "GET",
-		Function:        GetUser,
+		Function:        controllers.GetUser,
 		IsAutentication: false,
 	},
 	{
 		URI:             "/users/{userId}",
 		Method:          "PUT",
-		Function:        UpdateUser,
+		Function:        controllers.UpdateUser,
 		IsAutentication: false,
 	},
 	{
 		URI:             "/users/{userId}",
 		Method:          "DELETE",
-		Function:        DeleteUser,
+		Function:        controllers.DeleteUser,
 		IsAutentication: false,
 	},
 }
