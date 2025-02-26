@@ -5,13 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"api/src/config"
 	"api/src/router"
 )
 
 func main() {
-	fmt.Println("Rodando API")
+	config.Load()
 	r := router.CreateRouter()
 
-	log.Fatal(http.ListenAndServe(":8080", r))
-
+	fmt.Println("Rodando API")
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), r))
 }
