@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 )
 
 // CreateUser is a function that creates a user
@@ -48,7 +49,21 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUsers is a function that gets all users
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Getting all users"))
+	nameOrNick := strings.ToLower(r.URL.Query().Get("user"))
+
+	db, err := database.Connect()
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+	repositor := repositores.NewUserRepository(db)
+	users, err := repositor.FindUsersByNameOrNick(nameOrNick)
+	if err != nil {
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.Json(w, http.StatusOK, users)
 }
 
 // GetUser is a function that gets a user
