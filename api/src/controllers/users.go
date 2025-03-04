@@ -4,10 +4,9 @@ import (
 	database "api/src/dataBase"
 	"api/src/models"
 	"api/src/repositores"
+	"api/src/responses"
 	"encoding/json"
-	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -15,25 +14,29 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 	req, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		responses.Error(w, http.StatusUnprocessableEntity, err)
+		return
 	}
 	var user models.User
 	if err = json.Unmarshal(req, &user); err != nil {
-		log.Fatal(err)
+		responses.Error(w, http.StatusBadRequest, err)
+		return
 	}
 	db, err := database.Connect()
 	if err != nil {
-		log.Fatal(err)
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	repositore := repositores.NewUserRepository(db)
 
-	userId, err := repositore.CreateUser(user)
+	userBD, err := repositore.CreateUser(user)
 	if err != nil {
-		log.Fatal(err)
+		responses.Error(w, http.StatusInternalServerError, err)
+		return
 	}
 
-	w.Write([]byte(fmt.Sprintf("User created with id %d", userId.ID)))
+	responses.Json(w, http.StatusCreated, userBD)
 
 }
 
