@@ -23,7 +23,7 @@ type UserConfig struct {
 type User struct {
 	ID       uint64 `json:"id,omitempty"`
 	Name     string `json:"name,omitempty"`
-	Nickname     string `json:"nick,omitempty"`
+	Nickname     string `json:"nickname,omitempty"`
 	Email    string `json:"email,omitempty"`
 	Password string `json:"password,omitempty"`
 	CreatedAt string `json:"created_at,omitempty"`
