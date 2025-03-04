@@ -63,9 +63,9 @@ func (u user) addUserToTable(user models.User) (uint64, error) {
 	}
 
 	userID, err := userResult.LastInsertId()
-    if err != nil {
-        return 0, err
-    }
+	if err != nil {
+		return 0, err
+	}
 
 	return uint64(userID), nil
 }
@@ -101,4 +101,29 @@ func (u user) addUserConfigtoTable(userConfig models.UserConfig) (sql.Result, er
 		return nil, err
 	}
 	return userConfigResult, nil
+}
+
+// Find user by name or nickname or email
+func (u user) FindUsersByNameOrNick(nameOrNick string) ([]models.User, error) {
+	nameOrNick = "%" + nameOrNick + "%"
+
+	lines, err := u.db.Query(
+		"select id, name, nickname, email, crated_at from users where name like ? or nickname like ? or email like ?",
+		nameOrNick, nameOrNick, nameOrNick,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var users []models.User
+	for lines.Next() {
+		var user models.User
+		if err := lines.Scan(&user.ID, &user.Name, &user.Nickname, &user.Email, &user.CreatedAt, &user.UserAdress, &user.UserConfig); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }
