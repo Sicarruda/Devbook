@@ -103,13 +103,13 @@ func (u user) addUserConfigtoTable(userConfig models.UserConfig) (sql.Result, er
 	return userConfigResult, nil
 }
 
-// Find user by name or nickname or email
+// Find user by name or nickname
 func (u user) FindUsersByNameOrNick(nameOrNick string) ([]models.User, error) {
 	nameOrNick = "%" + nameOrNick + "%"
 
 	lines, err := u.db.Query(
-		"select id, name, nickname, email, crated_at from users where name like ? or nickname like ? or email like ?",
-		nameOrNick, nameOrNick, nameOrNick,
+		"select id, name, nickname, email, crated_at from users where name like ? or nickname like ?",
+		nameOrNick, nameOrNick,
 	)
 	if err != nil {
 		return nil, err
@@ -126,4 +126,47 @@ func (u user) FindUsersByNameOrNick(nameOrNick string) ([]models.User, error) {
 	}
 
 	return users, nil
+}
+
+// Find user by email
+func (u user) FindUserByEmail(email string) (models.User, error) {
+	findEmail := "%" + email + "%"
+	line, err := u.db.Query(
+		"select id, name, nickname, email, password, created_at from users where email like ?",
+		findEmail,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer line.Close()
+
+	var user models.User
+	if line.Next() {
+		if err := line.Scan(&user.ID, &user.Name, &user.Nickname, &user.Email, &user.Password, &user.CreatedAt); err != nil {
+			return models.User{}, err
+		}
+	}
+
+	return user, nil
+}
+
+// Find user by ID
+func (u user) FindUserByID(userID uint64) (models.User, error) {
+	line, err := u.db.Query(
+		"select id, name, nickname, email, created_at from users where id = ?",
+		userID,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer line.Close()
+
+	var user models.User
+	if line.Next() {
+		if err := line.Scan(&user.ID, &user.Name, &user.Nickname, &user.Email, &user.CreatedAt); err != nil {
+			return models.User{}, err
+		}
+	}
+
+	return user, nil
 }
